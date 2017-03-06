@@ -115,15 +115,11 @@ Resources:
     Type: "AWS::Lambda::Function"
     Properties: 
       Code:
-        S3Bucket: "mediaworkscftemplates"
-        S3Key: "LambdaCode/lifx_control.js.zip"
-        # ZipFile: >
-        #   var response = require('cfn-response');
-        #   exports.handler = function(event, context) {
-        #     var input = parseInt(event.ResourceProperties.Input);
-        #     var responseData = {Value: input * 5};
-        #     response.send(event, context, response.SUCCESS, responseData);
-        #   };
+        #location of node.js code for Lambda
+        #S3Bucket: "mediaworkscftemplates"
+        #S3Key: "LambdaCode/lifx_control.js.zip"
+        S3Bucket: "mediaworks-lambdajavacode"
+        S3Key: "original-lambda-java-example-0.0.1-SNAPSHOT.jar"
       Description: "Lambda triggered by IoT button to control Lifx bulb"
       Environment:
         Variables:
@@ -135,7 +131,8 @@ Resources:
       Role: 
       #"arn:aws:iam::921710562778:role/lambda_basic_execution"
         Fn::GetAtt: ["MyIoTLambdaRole", "Arn"]
-      Runtime: "nodejs4.3"
+      #Runtime: "nodejs4.3"
+      Runtime: "java8"
       Timeout: 10
 
 
