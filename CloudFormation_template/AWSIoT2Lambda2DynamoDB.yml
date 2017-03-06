@@ -1,0 +1,220 @@
+---
+#
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS IoT Button Demo
+Parameters:
+  ServiceName:
+    Description: Becomes the short hostname used in DNS, Naming, Comments, and other
+      things.
+    Type: String
+    MinLength: 1
+    MaxLength: 255
+    AllowedPattern: "^[a-zA-Z][-a-zA-Z0-9]*$"
+  ApplicationName:
+    Description: Application Name from CMDB
+    Type: String
+    MinLength: 1
+    MaxLength: 255
+  Environment:
+    Description: The Runtime Environment
+    Type: String
+    Default: dev
+    AllowedValues:
+    - alpha
+    - beta
+    - ci/cd
+    - poc
+    - dev
+    - itg
+    - qa
+    - uat
+    - prod-blue
+    - prod-green
+  CostCenter:
+    Description: CostCenter for Billing
+    Type: String
+    MinLength: 1
+    MaxLength: 9
+    AllowedPattern: "^[0-9]*$"
+  CreatedBy:
+    Description: CostCenter for Billing
+    Type: String
+    MinLength: 1
+    MaxLength: 8
+    AllowedPattern: "^[a-zA-Z][-a-zA-Z0-9]*$"
+  AccountName:
+    Description: Name for the current AWS Account
+    Type: String
+    MinLength: 1
+    MaxLength: 255
+    AllowedPattern: "^[a-zA-Z][-a-zA-Z0-9]*$"
+  ResourceBucketName:
+    Description: CloudFormation Resources S3 Bucket Name
+    Type: String
+    MinLength: 1
+    MaxLength: 255
+    AllowedPattern: "^[a-z][-a-z0-9]*$"
+  TemplateBucketName:
+    Description: Name for the Bucket to store CloudFormation templates in
+    Type: String
+    MinLength: 1
+    MaxLength: 255
+    AllowedPattern: "^[a-z][-a-z0-9]*$"
+  LiFXAPIToken:
+    Description: 'LiFX API Token to control LiFX lightbulb.'
+    Type: String
+    MinLength: 1
+    MaxLength: 255
+
+  
+Resources:
+  ButtonThing:
+    Type: AWS::IoT::Thing
+    Properties: 
+      AttributePayload :
+        Attributes :
+          CostCenter : 
+            Ref: "CostCenter"
+          CreatedBy : 
+            Ref: "CreatedBy"
+      #ThingName: String
+
+
+  MyIoTButtonPolicy: 
+    Type: "AWS::IoT::Policy"
+    Properties: 
+      #PolicyName: 
+       # Ref: "NameParameter"
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Action: 
+              - "iot:Publish"
+            Resource: 
+              - "arn:aws:iot:us-east-1:921710562778:topic/iotbutton/G030JF054345G1U2"
+
+
+  MyPolicyPrincipalAttachment: 
+    Type: "AWS::IoT::PolicyPrincipalAttachment"
+    Properties: 
+      PolicyName: 
+        Ref: "MyIoTButtonPolicy"
+      Principal: "arn:aws:iot:us-east-1:921710562778:cert/9cc3c7f5958d42e5287916c4742e9832803d9128a221f32925512184561485d1"
+
+  MyThingPrincipalAttachment: 
+    Type: "AWS::IoT::ThingPrincipalAttachment"
+    Properties: 
+      ThingName: 
+        Ref: "ButtonThing"
+      Principal: "arn:aws:iot:us-east-1:921710562778:cert/9cc3c7f5958d42e5287916c4742e9832803d9128a221f32925512184561485d1"
+
+
+  MyIoTLambda:
+    Type: "AWS::Lambda::Function"
+    Properties: 
+      Code:
+        S3Bucket: "mediaworkscftemplates"
+        S3Key: "LambdaCode/lifx_control.js.zip"
+        # ZipFile: >
+        #   var response = require('cfn-response');
+        #   exports.handler = function(event, context) {
+        #     var input = parseInt(event.ResourceProperties.Input);
+        #     var responseData = {Value: input * 5};
+        #     response.send(event, context, response.SUCCESS, responseData);
+        #   };
+      Description: "Lambda triggered by IoT button to control Lifx bulb"
+      Environment:
+        Variables:
+          LifxToken: 
+            Ref: "LiFXAPIToken"
+      Handler: "lifx_control.handler"
+#    KmsKeyArn: String
+#    MemorySize: Integer
+      Role: 
+      #"arn:aws:iam::921710562778:role/lambda_basic_execution"
+        Fn::GetAtt: ["MyIoTLambdaRole", "Arn"]
+      Runtime: "nodejs4.3"
+      Timeout: 10
+
+
+
+  MyTopicRule: 
+    Type: "AWS::IoT::TopicRule"
+     #DependsOn: "MyIoTLambda"
+    Properties: 
+      TopicRulePayload: 
+        RuleDisabled: "false"
+        Sql: >-
+          SELECT * FROM 'iotbutton/G030JF054345G1U2'
+        Actions: 
+          - 
+            Lambda:
+              FunctionArn: 
+  #               Fn::GetAtt: [Ref: "MyIoTLambda", "Arn"]
+                Fn::GetAtt: ["MyIoTLambda", "Arn"]
+
+  LambdaInvokePermission: 
+    Type: "AWS::Lambda::Permission"
+    DependsOn: "MyIoTLambda"
+    Properties: 
+      FunctionName: 
+        Ref: "MyIoTLambda"
+      Action: "lambda:InvokeFunction"
+      Principal: "iot.amazonaws.com"
+#      SourceArn: 
+#        Fn::GetAtt: ["MyTopicRule", "Arn"]
+
+
+  MyIoTLambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal: 
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AWSLambdaExecute"
+    #Path: String
+      Policies:
+        - 
+          PolicyName: "Lambda2DynamoDBIoTTable"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement: 
+              -
+                Effect: "Allow"
+                Action: 
+                  - "dynamodb:*"
+                Resource: 
+                  #Ref: IoTDynamoDBIoTClicks
+                  #Fn::GetAtt: ["IoTDynamoDBIoTClicks", "Arn"]
+                  "arn:aws:dynamodb:us-east-1:921710562778:table/MediaWorksIoTClicks"
+ 
+    #RoleName: String
+  IoTDynamoDBIoTClicks:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "DateTime"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "DateTime"
+          KeyType: "HASH"
+    #LocalSecondaryIndexes:
+    #  - LocalSecondaryIndexes
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+    #StreamSpecification:
+    #  StreamSpecification
+      TableName: "MediaWorksIoTClicks"
+
+Outputs: {}
