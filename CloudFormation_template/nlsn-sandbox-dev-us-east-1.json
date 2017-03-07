@@ -13,7 +13,7 @@
   },
   {
     "ParameterKey": "Environment",
-    "ParameterValue": "dev"
+    "ParameterValue": "test"
   },
   {
     "ParameterKey": "CostCenter",

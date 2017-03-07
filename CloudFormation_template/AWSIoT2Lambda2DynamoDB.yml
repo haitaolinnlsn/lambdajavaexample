@@ -18,7 +18,7 @@ Parameters:
   Environment:
     Description: The Runtime Environment
     Type: String
-    Default: dev
+    Default: test
     AllowedValues:
     - test
     - prod
