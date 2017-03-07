@@ -119,7 +119,7 @@ Resources:
         Variables:
           LifxToken: 
             Ref: "LiFXAPIToken"
-         DynamoDBTableName: 
+          DynamoDBTableName: 
             Ref: "IoTDynamoDBIoTClicks"
       Handler: "iotdemo.LambdaFunctionHandler"
 #      Handler: "lifx_control.handler"
