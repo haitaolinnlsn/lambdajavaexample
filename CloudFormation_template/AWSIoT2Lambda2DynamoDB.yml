@@ -125,7 +125,8 @@ Resources:
         Variables:
           LifxToken: 
             Ref: "LiFXAPIToken"
-      Handler: "lifx_control.handler"
+      Handler: "iotdemo.LambdaFunctionHandler"
+#      Handler: "lifx_control.handler"
 #    KmsKeyArn: String
 #    MemorySize: Integer
       Role: 
