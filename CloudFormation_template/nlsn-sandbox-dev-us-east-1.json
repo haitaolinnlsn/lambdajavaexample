@@ -1,38 +1,13 @@
-[
-  {
-    "ParameterKey": "ServiceName",
-    "ParameterValue": "MediaWorksAWSIoTDemo"
-  },
-  {
-    "ParameterKey": "ApplicationName",
-    "ParameterValue": "MediaWorksIoTDemo"
-  },
-  {
-    "ParameterKey": "AccountName",
-    "ParameterValue": "nonprod"
-  },
-  {
-    "ParameterKey": "Environment",
-    "ParameterValue": "dev"
-  },
-  {
-    "ParameterKey": "CostCenter",
-    "ParameterValue": "7501303"
-  },
-  {
-    "ParameterKey": "CreatedBy",
-    "ParameterValue": "linha01"
-  },
-  {
-    "ParameterKey": "ResourceBucketName",
-    "ParameterValue": "nlsn-mediaworks1dot0-cfn-resources-sandbox-dev-us-east-1"
-  },
-  {
-    "ParameterKey": "TemplateBucketName",
-    "ParameterValue": "nlsn-mediaworks1dot0-cfn-templates-sandbox-dev-us-east-1"
-  },
-  {
-    "ParameterKey": "LiFXAPIToken",
-    "ParameterValue": "c26312f3a89722db920b6a807685b36aaf7cecc92615ff9190316e425c748d00"
+{
+  "Parameters" : {
+    "ServiceName" : "MediaWorksAWSIoTDemo",
+    "ApplicationName" : "MediaWorksIoTDemo",
+    "AccountName" : "nonprod",
+    "Environment" : "dev",
+    "CostCenter" : "7501303",
+    "CreatedBy" : "linha01",
+    "ResourceBucketName" : "nlsn-mediaworks1dot0-cfn-resources-sandbox-dev-us-east-1",
+    "TemplateBucketName" : "nlsn-mediaworks1dot0-cfn-templates-sandbox-dev-us-east-1",
+    "LiFXAPIToken" : "c26312f3a89722db920b6a807685b36aaf7cecc92615ff9190316e425c748d00"
   }
-]
+}
