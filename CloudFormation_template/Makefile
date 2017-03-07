@@ -1,5 +1,5 @@
 # The CloudFormation template
-CFORM = AWSIoT2Lambda2DynamoDB.yml
+CFORM = AWSIoT2Lambda2DynamoDB_CF_demo.yml
 # AWS Region
 REGION = $(shell aws configure get region)
 

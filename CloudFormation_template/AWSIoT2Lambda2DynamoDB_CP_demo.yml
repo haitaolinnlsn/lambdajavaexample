@@ -117,8 +117,10 @@ Resources:
       Description: "Lambda triggered by IoT button to control Lifx bulb"
       Environment:
         Variables:
-          LifxToken: 
+        - LifxToken: 
             Ref: "LiFXAPIToken"
+        - DynamoDBTableName: 
+            Ref: "IoTDynamoDBIoTClicks"
       Handler: "iotdemo.LambdaFunctionHandler"
 #      Handler: "lifx_control.handler"
 #    KmsKeyArn: String
@@ -188,7 +190,7 @@ Resources:
                 Resource: 
                   #Ref: IoTDynamoDBIoTClicks
                   #Fn::GetAtt: ["IoTDynamoDBIoTClicks", "Arn"]
-                  "arn:aws:dynamodb:us-east-1:921710562778:table/MediaWorksIoTClicks"
+                  "arn:aws:dynamodb:*"
  
     #RoleName: String
   IoTDynamoDBIoTClicks:
@@ -208,6 +210,6 @@ Resources:
     #StreamSpecification:
     #  StreamSpecification
       TableName: 
-        !If [SetTestTableName, "MediaWorksIoTClicksTest", "MediaWorksIoTClicksTest"]
+        !If [SetTestTableName, "MediaWorksIoTClicksTest", "MediaWorksIoTClicksProd"]
 
 Outputs: {}
