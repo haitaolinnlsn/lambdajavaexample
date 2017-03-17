@@ -19,7 +19,7 @@ public class LambdaFunctionHandler implements RequestStreamHandler {
             System.out.write(Character.toUpperCase(letter));
         	output.write(Character.toUpperCase(letter));
         }
-        System.out.println("Hello \n world");
+        System.out.println("Hello1 \n world");
     }
 
 }
